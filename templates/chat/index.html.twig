@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chat{% endblock %}
+
+{% block body %}
+    
+<style>
+	body {
+		font-family: Arial, sans-serif;
+	}
+	#chat-container {
+		max-width: 600px;
+		margin: 20px auto;
+		padding: 20px;
+		border: 1px solid #ccc;
+		border-radius: 8px;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	}
+	#messages {
+		height: 300px;
+		overflow-y: auto;
+		border: 1px solid #ddd;
+		padding: 10px;
+		margin-bottom: 10px;
+	}
+	#message-input {
+		width: 70%;
+		padding: 8px;
+		margin-right: 10px;
+	}
+	button {
+		padding: 8px 12px;
+		cursor: pointer;
+	}
+</style>
+<div id="chat-container">
+ 	{{user_id}}
+	<div id="messages"></div>
+	<input type="text" id="message-input" placeholder="Type your message...">
+	<button id="send-btn">Send</button>
+	<button id="next-btn">Next</button>
+</div>
+<script>
+
+let chatId = null;
+let peerId = null;
+
+async function pairUser() {
+    const response = await fetch('{{ path("pair") }}');
+    const data = await response.json();
+
+    if (data && data.peerId && data.chatId) {
+        peerId = data.peerId;
+        chatId = data.chatId;
+        subscribeToChat(chatId);
+        displayMessage('Connected to a new peer!');
+    } else {
+        displayMessage('Waiting for a peer...');
+        setTimeout(pairUser, 3000)
+    }
+}
+
+async function sendMessage() {
+	const message = document.getElementById('message-input').value;
+	if (chatId && message) {
+		await fetch('{{ path("send_message") }}', {
+			method: 'POST',
+			headers: {
+			'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({chatId, message})
+		});
+		document.getElementById('message-input').value = '';
+	}
+}
+
+function subscribeToChat(chatId) {
+	const url = new URL('{{ mercure_url }}');
+	url.searchParams.append('topic', `chat-topic-${chatId}`);
+
+	const eventSource = new EventSource(url);
+
+	eventSource.onmessage = (event) => {
+		const data = JSON.parse(event.data);
+		
+		let name = data.from === '{{user_id}}' ? "You" : "Peer";
+		displayMessage(`${name}: ${
+			data.message
+		}`);
+	};
+
+	eventSource.onerror = () => {
+		displayMessage('Connection lost. Waiting for a new peer...');
+	};
+}
+
+function createChatId(peerId) {
+	const sessionId = getSessionId();
+	return [sessionId, peerId].sort().join('-');
+}
+
+function getSessionId() {
+	if (!localStorage.getItem('sessionId')) {
+		localStorage.setItem('sessionId', `user_${Date.now()}`);
+	}
+	return localStorage.getItem('sessionId');
+}
+
+function displayMessage(message) {
+	const messagesDiv = document.getElementById('messages');
+	const messageElem = document.createElement('div');
+	messageElem.textContent = message;
+	messagesDiv.appendChild(messageElem);
+}
+
+document.getElementById('send-btn').addEventListener('click', sendMessage);
+document.getElementById('next-btn').addEventListener('click', async () => {
+	document.getElementById('messages').innerHTML = '';
+	displayMessage('Finding a new peer...');
+	await pairUser();
+});
+
+pairUser();
+
+</script>
+
+{% endblock %}
