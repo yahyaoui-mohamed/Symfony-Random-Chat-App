@@ -27,27 +27,30 @@ Before running the project, ensure you have the following installed:
 2. **Install dependencies**
   ```bash
     composer install
-
+  ```
 3. **Set up environment variables**
   ```bash
     MERCURE_PUBLISH_URL=http://localhost:3000/.well-known/mercure
     MERCURE_JWT_SECRET=yourmercurejwtsecret
     REDIS_URL=redis://127.0.0.1:6379
+  ```
 
 4. **Run Redis**
   - Make sure Redis is running. If not, start it with:
   ```bash
     redis-server
+  ```
 
 5. **Start the Mercure Hub**
   - Download and start the Mercure hub. Example:
   ```bash
     $env:MERCURE_PUBLISHER_JWT_KEY='!ChangeThisMercureHubJWTSecretKey!' $env:MERCURE_SUBSCRIBER_JWT_KEY='!ChangeThisMercureHubJWTSecretKey!'; .\mercure.exe run --config dev Caddyfile
+  ```
 
 6. **Start the symfony server**
-    ```bash
-      symfony server:start --no-tls -d
-
+  ```bash
+    symfony server:start --no-tls -d
+  ```
 ## Requirements
   1. Open your browser and navigate to http://localhost:8000.
   2. Enjoy using the app :) !
