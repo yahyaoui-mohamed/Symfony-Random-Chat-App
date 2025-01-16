@@ -52,5 +52,5 @@ Before running the project, ensure you have the following installed:
     symfony server:start --no-tls -d
   ```
 ## Requirements
-  1. Open your browser and navigate to http://localhost:8000.
+  1. Open your browser and navigate to http://localhost:8000/chat.
   2. Enjoy using the app :) !
