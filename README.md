@@ -12,6 +12,7 @@ This is a real-time random chat application built using **Symfony**, **Mercure**
 Before running the project, ensure you have the following installed:
 - PHP 8.1 or higher
 - Composer
+- Symfony 7.2 or higher
 - Symfony CLI
 - Redis
 - Mercure hub
