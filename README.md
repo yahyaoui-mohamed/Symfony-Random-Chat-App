@@ -5,7 +5,7 @@ This is a real-time random chat application built using **Symfony**, **Mercure**
 ## Features
 - Real-time chat using Mercure
 - Random user pairing for chats
-- Redis for session and message storage
+- Predis for session and message storage
 - Built with Symfony framework
 
 ## Requirements
@@ -14,7 +14,7 @@ Before running the project, ensure you have the following installed:
 - Composer
 - Symfony 7.2 or higher
 - Symfony CLI
-- Redis
+- Predis
 - Mercure hub
 
 ## Installation
@@ -31,7 +31,7 @@ Before running the project, ensure you have the following installed:
 3. **Set up environment variables**
   ```bash
     MERCURE_PUBLISH_URL=http://localhost:3000/.well-known/mercure
-    MERCURE_JWT_SECRET=yourmercurejwtsecret
+    MERCURE_JWT_SECRET=!ChangeThisMercureHubJWTSecretKey!
     REDIS_URL=redis://127.0.0.1:6379
   ```
 
@@ -42,10 +42,17 @@ Before running the project, ensure you have the following installed:
   ```
 
 5. **Start the Mercure Hub**
-  - Download and start the Mercure hub. Example:
-  ```bash
-    $env:MERCURE_PUBLISHER_JWT_KEY='!ChangeThisMercureHubJWTSecretKey!' $env:MERCURE_SUBSCRIBER_JWT_KEY='!ChangeThisMercureHubJWTSecretKey!'; .\mercure.exe run --config dev Caddyfile
+  To start the Mercure Hub, you need to set up a JWT key and start the Mercure server.
+
+  1. Open **PowerShell** (or terminal on your machine).
+  2. Navigate to the directory where you have the Mercure executable.
+  3. Run the following command:
+
+  ```powershell
+  $env:MERCURE_PUBLISHER_JWT_KEY='!ChangeThisMercureHubJWTSecretKey!'; $env:MERCURE_SUBSCRIBER_JWT_KEY='!ChangeThisMercureHubJWTSecretKey!'; .\mercure.exe run --config dev.Caddyfile
   ```
+
+> **Important**: Replace the `!ChangeThisMercureHubJWTSecretKey!` with a secret key of your choice. This key will be used to sign JWTs required for the Mercure protocol.
 
 6. **Start the symfony server**
   ```bash
