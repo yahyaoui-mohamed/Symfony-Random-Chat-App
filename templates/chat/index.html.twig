@@ -58,6 +58,10 @@ async function pairUser() {
         displayMessage('Waiting for a peer...');
         setTimeout(pairUser, 3000)
     }
+		fetch("/queue-length").then(resp => resp.json()).then(resp => 
+		{
+			console.log(resp);
+		})
 }
 
 async function sendMessage() {

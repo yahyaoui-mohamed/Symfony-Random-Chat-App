@@ -14,7 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ChatController extends AbstractController
 {
-    private $pairingService;
     private Client $redis;
 
     public function __construct(Client $redis)
@@ -22,14 +21,14 @@ class ChatController extends AbstractController
         $this->redis = $redis;
     }
 
-    #[Route('/chat', name: 'chat')]
+    #[Route('/', name: 'chat')]
     public function index(SessionInterface $session): Response
     {
         if ($session->has('user_id')) {
             $userid = $session->get("user_id");
         } else {
-            $userId = uniqid('user_', true);
-            $session->set('user_id', $userId);
+            $userid = uniqid('user_', true);
+            $session->set('user_id', $userid);
         }
         return $this->render('chat/index.html.twig', [
             'mercure_url' => $this->getParameter('mercure.default_hub'),
@@ -57,7 +56,7 @@ class ChatController extends AbstractController
             }
         }
 
-        $pairData = $this->pairingService->addToQueue($userId);
+        $pairData = $this->addToQueue($userId);
 
         if ($pairData) {
             return new JsonResponse($pairData);
@@ -70,12 +69,11 @@ class ChatController extends AbstractController
     {
         if ($this->redis->llen("waiting_queue") > 0) {
             $peerId = $this->redis->lpop('waiting_queue');
-            $this->redis->rpush('waiting_queue', $userId);
-
             return $peerId;
+        } else {
+            $this->redis->rpush('waiting_queue', $userId);
+            return null;
         }
-        $this->redis->rpush('waiting_queue', $userId);
-        return null;
     }
 
     private function generateChatId(string $userId1, string $userId2): ?string
@@ -92,6 +90,8 @@ class ChatController extends AbstractController
     public function queueLength(): JsonResponse
     {
         $length = $this->redis->llen('waiting_queue');
+        $content = $this->redis->lrange('waiting_queue', 0, $length);
+        dd($content);
         return new JsonResponse(['length' => $length]);
     }
 
