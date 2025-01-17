@@ -21,7 +21,7 @@ Before running the project, ensure you have the following installed:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/random-chat-app.git
+   git clone https://github.com/yahyaoui-mohamed/Symfony-Random-Chat-App
    cd random-chat-app
 
 2. **Install dependencies**
